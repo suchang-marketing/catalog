@@ -120,6 +120,18 @@ const enItems = ITEMS.map(it => {
   };
 });
 
+
+// ── 정렬: 카테고리(농산물→해조류→약재) 안에서 영문명 A~Z ──
+// 한글판은 카테고리 안에서 가나다순이라, 영문판은 같은 자리에서 알파벳순이어야 바이어가 찾기 쉽다.
+const CAT_ORDER = { agri: 0, sea: 1, herb: 2 };
+enItems.sort((a, b) => {
+  const d = (CAT_ORDER[a.catK] ?? 99) - (CAT_ORDER[b.catK] ?? 99);
+  if (d !== 0) return d;
+  const n = a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+  if (n !== 0) return n;
+  return a.id.localeCompare(b.id);      // 영문명이 같으면 ID로 순서를 고정
+});
+
 const enMeta = {
   total: META.total,
   goods: META.goods,
