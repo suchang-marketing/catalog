@@ -1,0 +1,238 @@
+﻿MaterialID,원물명,영문명,학명,비고
+M001,콜라비,Kohlrabi,Brassica oleracea var. gongylodes,
+M002,비트,Beetroot,Beta vulgaris,
+M003,머위,Butterbur,Petasites japonicus,
+M004,청귤,Green (Unripe) Mandarin,Citrus unshiu,확인필요
+M005,대파,Welsh Onion,Allium fistulosum,
+M006,감자,Potato,Solanum tuberosum,
+M007,고구마,Sweet Potato,Ipomoea batatas,
+M008,고사리,Bracken Fern,Pteridium aquilinum var. latiusculum,
+M009,고추,Red Pepper,Capsicum annuum,
+M010,귀리,Oat,Avena sativa,
+M011,구아바,Guava,Psidium guajava,
+M012,귤,Satsuma Mandarin,Citrus unshiu,
+M013,그린키위,Green Kiwifruit,Actinidia deliciosa,
+M014,레드키위,Red Kiwifruit,Actinidia chinensis,
+M015,골드키위,Gold Kiwifruit,Actinidia chinensis,
+M016,기장,Proso Millet,Panicum miliaceum,
+M017,고깔양배추,Pointed Cabbage,Brassica oleracea var. capitata f. acuta,
+M018,나한송,Buddhist Pine,Podocarpus macrophyllus,
+M019,녹차,Green Tea,Camellia sinensis,
+M020,늙은호박,Mature Pumpkin,Cucurbita moschata,
+M021,단호박,Kabocha Squash,Cucurbita maxima,
+M022,당근,Carrot,Daucus carota,
+M023,댕유자,Dangyuja Citron,Citrus grandis,
+M024,도라지,Balloon Flower Root,Platycodon grandiflorus,
+M025,돼지감자,Jerusalem Artichoke,Helianthus tuberosus,
+M026,자색돼지감자,Purple Jerusalem Artichoke,Helianthus tuberosus,
+M027,딸기,Strawberry,Fragaria x ananassa,
+M028,마늘,Garlic,Allium sativum,
+M029,마루메루,Quince,Cydonia oblonga,확인필요
+M030,메밀,Buckwheat,Fagopyrum esculentum,
+M031,쓴메밀,Tartary Buckwheat,Fagopyrum tataricum,
+M032,무,Korean Radish,Raphanus sativus,
+M033,무화과,Fig,Ficus carica,
+M034,보리,Barley,Hordeum vulgare,
+M035,병풀,Centella (Gotu Kola),Centella asiatica,
+M036,브로콜리,Broccoli,Brassica oleracea var. italica,
+M037,부추,Chinese Chive,Allium tuberosum,
+M038,산물귤(진귤),Sunki Mandarin,Citrus sunki,
+M039,생강,Ginger,Zingiber officinale,
+M040,쇠비름,Purslane,Portulaca oleracea,
+M041,스테비아,Stevia,Stevia rebaudiana,
+M042,시금치,Spinach,Spinacia oleracea,
+M043,쑥,Korean Mugwort,Artemisia princeps,
+M044,알로에,Aloe Vera,Aloe vera,
+M045,양상추,Iceberg Lettuce,Lactuca sativa,
+M046,양배추,Cabbage,Brassica oleracea var. capitata,
+M047,양파,Onion,Allium cepa,
+M048,여주,Bitter Melon,Momordica charantia,
+M049,얼갈이배추,Baby Napa Cabbage,Brassica rapa,
+M050,우도땅콩,Udo Island Peanut,Arachis hypogaea,
+M051,유자,Yuzu Citron,Citrus junos,
+M052,유채나물,Rapeseed Greens,Brassica napus,
+M053,이슬송이,Iseulsongi Mushroom,Pleurotus ostreatus,확인필요
+M054,적채,Red Cabbage,Brassica oleracea var. capitata f. rubra,
+M055,제주밭벼(산듸),Jeju Upland Rice (Sandui),Oryza sativa,
+M056,조릿대,Jeju Dwarf Bamboo,Sasa quelpaertensis,
+M057,참가시나무(이백저),Bamboo-leaf Oak,Quercus salicina,
+M058,차요태,Chayote,Sechium edule,
+M059,취나물,Aster Greens,Aster scaber,
+M060,참나물,Korean Parsley,Pimpinella brachycarpa,
+M061,천혜향,Cheonhyehyang Mandarin,Citrus reticulata hybrid,
+M062,황금향,Hwanggeumhyang Mandarin,Citrus reticulata hybrid,
+M063,천화분(과루),Trichosanthes Root,Trichosanthes kirilowii,
+M064,한라봉,Hallabong Mandarin,Citrus reticulata 'Dekopon',
+M065,표고버섯,Shiitake Mushroom,Lentinula edodes,
+M066,해바라기,Sunflower,Helianthus annuus,
+M067,가시두릅,Prickly Castor-oil Tree Shoots,Kalopanax septemlobus,확인필요
+M068,겹벚꽃,Double Cherry Blossom,Prunus serrulata f. plena,
+M069,동백,Camellia,Camellia japonica,
+M070,두릅,Angelica Tree Shoots,Aralia elata,
+M071,들국화,Wild Chrysanthemum,Chrysanthemum boreale,확인필요
+M072,레몬,Lemon,Citrus limon,
+M073,미니밤호박,Mini Chestnut Squash,Cucurbita maxima,
+M074,방풍나물,Coastal Hog Fennel,Peucedanum japonicum,
+M075,백련초,Prickly Pear Cactus,Opuntia ficus-indica,
+M076,뱀딸기,Mock Strawberry,Duchesnea indica,
+M077,벚꽃,Cherry Blossom,Prunus yedoensis,
+M078,산수국,Mountain Hydrangea,Hydrangea serrata,
+M079,연꽃,Lotus,Nelumbo nucifera,
+M080,올리브,Olive,Olea europaea,
+M081,콩자개,Green Penny Fern,Lemmaphyllum microphyllum,확인필요
+M082,편백나무,Hinoki Cypress,Chamaecyparis obtusa,
+M083,자색옥수수,Purple Corn,Zea mays,
+M084,초당옥수수,Super Sweet Corn,Zea mays var. saccharata,
+M085,황옥수수,Yellow Corn,Zea mays,
+M086,가지,Eggplant,Solanum melongena,
+M087,들깨,Perilla,Perilla frutescens,
+M088,코끼리마늘,Elephant Garlic,Allium ampeloprasum,
+M089,검둥감태(우도),Dark Ecklonia Kelp (Udo),Ecklonia cava,
+M090,감태,Ecklonia Kelp (Gamtae),Ecklonia cava,
+M091,괭생이모자반,Devil Weed (Horned Gulfweed),Sargassum horneri,
+M092,구멍갈파래,Perforated Sea Lettuce,Ulva pertusa,
+M093,넓미역,Broad Wakame (Neolmiyeok),Undariopsis peterseniana,
+M094,넓패,Broad Ishige,Ishige sinicola,
+M095,다시마(우도),Kombu Kelp (Udo),Saccharina japonica,
+M096,도박,Grateloupia Red Alga,Grateloupia sp.,종명확인
+M097,돌미역(우도),Wild Sea Mustard (Udo),Undaria pinnatifida,
+M098,미역,Sea Mustard (Wakame),Undaria pinnatifida,
+M099,미역귀(우도),Wakame Sporophyll (Mekabu / Udo),Undaria pinnatifida,
+M100,우뭇가사리(탈색),Agar Weed (Bleached),Gelidium amansii,
+M101,딱새우,Jeju Ridgeback Shrimp,Metapenaeopsis dalei,동물성
+M102,스피루리나,Spirulina,Arthrospira platensis,
+M103,진두발,Irish Moss (Jindubal),Chondrus ocellatus,
+M104,청각,Sea Staghorn,Codium fragile,
+M105,패,Ishige Brown Alga,Ishige okamurae,
+M106,톳,Hijiki,Sargassum fusiforme,
+M107,가시뼈대그물말,Spiny Netted Brown Alga,Dictyopteris sp.,종명확인
+M108,경단구슬모자반,Beaded Gulfweed,Sargassum muticum,종명확인
+M109,고리매,Soda Straw Weed,Scytosiphon lomentaria,
+M110,꼬인바위수염,Twisted Rock Whisker,Myelophycus sp.,종명확인
+M111,꽈배기모자반,Twisted Gulfweed,Sargassum sp.,종명확인
+M112,모자반,Gulfweed (Mojaban),Sargassum fulvellum,
+M113,미역쇠,Sea Petal,Petalonia binghamiae,
+M114,바위두둑,Rock Ridge Brown Alga,Chnoospora sp.,종명확인
+M115,반주름말,Half-wrinkled Brown Alga,Dictyopteris sp.,종명확인
+M116,반질불레기말,Smooth Oyster Thief,Colpomenia sp.,종명확인
+M117,부챗말,Peacock's Tail,Padina arborescens,
+M118,불레기말,Oyster Thief,Colpomenia sinuosa,
+M119,쌍발이모자반,Twin-branched Gulfweed,Sargassum sp.,종명확인
+M120,아롱부챗말(분부챗말),Mottled Peacock's Tail,Padina sp.,종명확인
+M121,알쏭이모자반,Mottled Gulfweed,Sargassum sp.,종명확인
+M122,왜모자반,Dwarf Gulfweed,Sargassum sp.,종명확인
+M123,외톨개모자반,Solitary Gulfweed,Myagropsis myagroides,
+M124,잔가시모자반,Small-spined Gulfweed,Sargassum micracanthum,
+M125,지충이,Thunberg's Gulfweed,Sargassum thunbergii,
+M126,짝잎모자반,Paired-leaf Gulfweed,Sargassum sp.,종명확인
+M127,참가죽그물바탕말,Leathery Ribbon Weed,Dictyota sp.,종명확인
+M128,참그물바탕말,Forked Ribbon Weed,Dictyota dichotoma,
+M129,큰열매모자반,Large-fruited Gulfweed,Sargassum macrocarpum,
+M130,큰잎모자반,Large-leaved Gulfweed,Sargassum sp.,종명확인
+M131,납작파래,Flat Sea Lettuce,Ulva compressa,
+M132,넓은큰갈파래,Broad Sea Lettuce,Ulva sp.,종명확인
+M133,댕기갈파래,Ribbon Sea Lettuce,Ulva sp.,종명확인
+M134,띠갈파래,Banded Sea Lettuce,Ulva fasciata,
+M135,말청각,Cylindrical Sea Staghorn,Codium cylindricum,
+M136,모란갈파래,Clustered Sea Lettuce,Ulva conglobata,
+M137,잎파래,Leafy Sea Lettuce,Ulva linza,
+M138,참갈파래,Sea Lettuce,Ulva lactuca,
+M139,초록갈파래,Green Sea Lettuce,Ulva sp.,종명확인
+M140,큰갈파래,Large Sea Lettuce,Ulva sp.,종명확인
+M141,가는개도박,Slender Grateloupia,Grateloupia sp.,종명확인
+M142,가락진두발,Slender Irish Moss,Chondrus sp.,종명확인
+M143,개서실,Thick-stemmed Laurencia,Chondria crassicaulis,
+M144,개우무,Agar Weed (Pterocladiella),Pterocladiella capillacea,
+M145,겹가지서실,Branched Laurencia,Laurencia sp.,종명확인
+M146,고리마디게발,Jointed Coralline Alga,Amphiroa sp.,종명확인
+M147,긴가지산호말,Long-branched Coralline Alga,Corallina sp.,종명확인
+M148,긴까막살,Long Grateloupia,Grateloupia sp.,종명확인
+M149,꼬물꼬시래기,Curled Ogonori,Gracilaria sp.,종명확인
+M150,꼬불꼬시래기,Twisted Ogonori,Gracilaria sp.,종명확인
+M151,꼬시래기,Ogonori (Sea String),Gracilaria vermiculophylla,
+M152,꽃지누아리,Flowering Grateloupia,Grateloupia sp.,종명확인
+M153,넓은게발,Broad Coralline Alga,Amphiroa sp.,종명확인
+M154,대롱진두발,Tubular Irish Moss,Chondrus sp.,종명확인
+M155,돌가사리,Turkish Towel (Chondracanthus),Chondracanthus tenellus,
+M156,둘레혹산호말(둘레개발혹),Encrusting Coralline Alga,Lithophyllum sp.,종명확인
+M157,마디잘록이,Jointed Lomentaria,Lomentaria sp.,종명확인
+M158,모로우붉은실,Morrow's Red Thread Alga,Neosiphonia morrowii,
+M159,부채까막살,Fan Grateloupia,Grateloupia sp.,종명확인
+M160,부챗살,Fan Red Alga,Rhodophyta sp.,속명확인
+M161,불등풀가사리,Funori (Forked Gloiopeltis),Gloiopeltis furcata,
+M162,비늘산호말,Scaly Coralline Alga,Corallina sp.,종명확인
+M163,빗살도박,Comb Grateloupia,Grateloupia sp.,종명확인
+M164,쌍발이서실,Twin-branched Laurencia,Laurencia sp.,종명확인
+M165,애기돌가사리,Dwarf Turkish Towel,Chondracanthus sp.,종명확인
+M166,여린가위손말(여린두가닥바닷말),Delicate Coralline Alga,Corallinaceae sp.,속명확인
+M167,우뭇가사리,Agar Weed (Umutgasari),Gelidium amansii,
+M168,잎꼬시래기,Leafy Ogonori,Gracilaria textorii,
+M169,지네지누아리,Centipede Grateloupia,Grateloupia filicina,종명확인
+M170,참까막살,True Grateloupia,Grateloupia elliptica,종명확인
+M171,참도박,Grateloupia (Chamdobak),Grateloupia sp.,종명확인
+M172,참풀가사리,Funori (Tenacious Gloiopeltis),Gloiopeltis tenax,
+M173,개꼬시래기,Wild Ogonori,Gracilaria sp.,종명확인
+M174,혹고들서실,Knotted Laurencia,Laurencia sp.,종명확인
+M175,참화살깃산호말,Arrow-vane Coralline Alga,Corallinaceae sp.,속명확인
+M176,해마,Seahorse,Hippocampus sp.,동물성
+M177,어성초,Houttuynia (Fish Mint),Houttuynia cordata,
+M178,송담,Songdam (Jeju Ivy),Hedera rhombea,
+M179,팔손이,Japanese Aralia,Fatsia japonica,
+M180,통초(통탈목),Rice Paper Plant,Tetrapanax papyrifer,
+M181,소루쟁이,Curled Dock,Rumex crispus,
+M182,붉은토끼풀,Red Clover,Trifolium pratense,
+M183,작약,Peony Root,Paeonia lactiflora,
+M184,인삼,Ginseng,Panax ginseng,
+M185,가시엉겅퀴,Korean Thistle,Cirsium japonicum var. maackii,
+M186,개옻나무,Japanese Sumac,Toxicodendron trichocarpum,
+M187,갯방풍,Coastal Glehnia,Glehnia littoralis,
+M188,겨우살이,Mistletoe,Viscum album var. coloratum,
+M189,고수,Coriander,Coriandrum sativum,
+M190,구지뽕,Silkworm Thorn,Maclura tricuspidata,
+M191,담팔수잎,Elaeocarpus Leaf,Elaeocarpus sylvestris,
+M192,더덕,Deodeok (Lance Asiabell),Codonopsis lanceolata,
+M193,돌외,Jiaogulan,Gynostemma pentaphyllum,
+M194,때죽나무,Japanese Snowbell,Styrax japonicus,
+M195,만형자,Chaste Tree Fruit,Vitex rotundifolia,
+M196,맥문동,Liriope Root,Liriope platyphylla,
+M197,소엽맥문동,Dwarf Liriope,Ophiopogon japonicus,
+M198,박하,Mint,Mentha arvensis,
+M199,백수오(백하수오),Baeksuo (Cynanchum Root),Cynanchum wilfordii,
+M200,비파나무,Loquat,Eriobotrya japonica,
+M201,상황버섯,Sanghwang Mushroom,Phellinus linteus,
+M202,석창포,Grassleaf Sweetflag,Acorus gramineus,
+M203,섬오가피,Jeju Acanthopanax,Eleutherococcus koreanus,종명확인
+M204,생열귀나무,Dahurian Rose,Rosa davurica,
+M205,수세미,Luffa,Luffa cylindrica,
+M206,예덕나무,Japanese Mallotus,Mallotus japonicus,
+M207,야관문,Yagwanmun (Chinese Bushclover),Lespedeza cuneata,
+M208,우슬,Achyranthes Root,Achyranthes japonica,
+M209,울금,Turmeric,Curcuma longa,
+M210,윤동초,Japanese Honeysuckle,Lonicera japonica,품목명확인
+M211,질경이,Asian Plantain,Plantago asiatica,
+M212,천궁,Cnidium Rhizome,Cnidium officinale,
+M213,천남성,Jack-in-the-pulpit,Arisaema amurense,
+M214,털머위,Leopard Plant,Farfugium japonicum,
+M215,하귤(나스미깡),Natsumikan (Summer Orange),Citrus natsudaidai,
+M216,한련초,False Daisy,Eclipta prostrata,
+M217,헛개나무,Oriental Raisin Tree,Hovenia dulcis,
+M218,후박나무,Red Machilus,Machilus thunbergii,
+M219,황칠나무,Dendropanax (Golden Lacquer Tree),Dendropanax morbiferus,
+M220,계요등,Skunk Vine,Paederia foetida,
+M221,계피,Cinnamon,Cinnamomum cassia,
+M222,고삼,Sophora Root,Sophora flavescens,
+M223,대나무,Bamboo,Phyllostachys sp.,종명확인
+M224,문주란,Crinum Lily,Crinum asiaticum,
+M225,목련,Magnolia,Magnolia kobus,
+M226,민들레,Dandelion,Taraxacum platycarpum,
+M227,비자나무,Japanese Nutmeg Yew,Torreya nucifera,
+M228,삼나무,Japanese Cedar,Cryptomeria japonica,
+M229,삼백초,Chinese Lizard's Tail,Saururus chinensis,
+M230,세신이약,Wild Ginger (Asarum),Asarum sieboldii,품목명확인
+M231,소나무,Korean Red Pine,Pinus densiflora,
+M232,철쭉,Royal Azalea,Rhododendron schlippenbachii,
+M233,초피,Sichuan Pepper,Zanthoxylum piperitum,
+M234,칡,Kudzu,Pueraria lobata,
+M235,아티초크,Artichoke,Cynara scolymus,
+M236,시로미,Crowberry,Empetrum nigrum var. japonicum,
+M237,자초,Gromwell Root,Lithospermum erythrorhizon,
