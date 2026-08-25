@@ -306,9 +306,10 @@ else head = head.replace('<div class="dl">', EN_SW + '\n      <div class="dl">')
 head = head.replace('href="%EC%B7%A8%EA%B8%89%ED%92%88%EB%AA%A9_%EC%B9%B4%ED%83%88%EB%A1%9C%EA%B7%B8.pdf"',
   'href="../%EC%B7%A8%EA%B8%89%ED%92%88%EB%AA%A9_%EC%B9%B4%ED%83%88%EB%A1%9C%EA%B7%B8.pdf"');
 
-// og:image / favicon 은 한글판 폴더의 것을 그대로 쓴다
+// og:image = 영문 전용 썸네일(en/og.png). 카톡·SNS 미리보기가 한글로 뜨지 않게 한다.
+// 그림은 make-og-en.py 로 만든다 (한글판 og.png의 로고·배경을 그대로 쓰고 글자만 영어)
 head = head.replace(/https:\/\/suchang-marketing\.github\.io\/catalog\/og\.png/g,
-  'https://suchang-marketing.github.io/catalog/og.png');
+  'https://suchang-marketing.github.io/catalog/en/og.png');
 
 // ── 조립 ────────────────────────────────────────────────────
 const out = [
