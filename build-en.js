@@ -267,21 +267,28 @@ tail = tail.replace(SCI_ANCHOR,
   '${it.sci?`<span class="dk">Scientific Name</span><span class="dv"><i>${esc(it.sci)}</i></span>`:\'\'}\n          ' +
   '<span class="dk">Korean Name</span><span class="dv">${esc(it.ko)}</span>\n          ' + SCI_ANCHOR);
 
-// 학명 표시용 css와 언어 전환 단추 스타일을 CSS 끝에 덧붙인다
-const CSS_ADD = `
+// 학명 표시용 css를 CSS 끝에 덧붙인다 (영문판에만 필요)
+const CSS_SCI = `
 /* ── 영문판 추가분 ── */
 .sci{display:block; font-style:italic; color:var(--ink-faint); font-size:.78rem; margin-top:.08rem; line-height:1.3}
+</style>`;
+head = head.replace(/<\/style>(?![\s\S]*<\/style>)/, CSS_SCI);
+
+// 언어 전환 단추 스타일은 한글판에 이미 있으면 다시 넣지 않는다
+const CSS_LANG = `
 .langsw{display:inline-flex; border:1px solid var(--line); border-radius:var(--r); overflow:hidden; flex:none}
 .langsw a{padding:.5rem .7rem; font-size:.85rem; text-decoration:none; color:var(--ink-soft); background:var(--panel)}
 .langsw a[aria-current="true"]{background:var(--accent); color:#fff}
 .langsw a:not([aria-current="true"]):hover{color:var(--ink)}
 </style>`;
-head = head.replace(/<\/style>(?![\s\S]*<\/style>)/, CSS_ADD);
+if (!head.includes('.langsw{')) head = head.replace(/<\/style>(?![\s\S]*<\/style>)/, CSS_LANG);
 
-// 조작부에 KO / EN 전환 단추를 넣는다
-head = head.replace('<div class="dl">',
-  `<div class="langsw"><a href="../" hreflang="ko">KO</a><a href="./" aria-current="true" hreflang="en">EN</a></div>
-      <div class="dl">`);
+// KO / EN 전환 단추 — 한글판에 이미 있으면 영문판용으로 바꿔 끼우고, 없으면 새로 넣는다
+// (그냥 넣기만 하면 단추가 두 벌 생긴다 — 실제로 겪은 사고)
+const KO_SW = '<div class="langsw"><a href="./" aria-current="true" hreflang="ko">KO</a><a href="en/" hreflang="en">EN</a></div>';
+const EN_SW = '<div class="langsw"><a href="../" hreflang="ko">KO</a><a href="./" aria-current="true" hreflang="en">EN</a></div>';
+if (head.includes(KO_SW)) head = head.split(KO_SW).join(EN_SW);
+else head = head.replace('<div class="dl">', EN_SW + '\n      <div class="dl">');
 
 // PDF 링크는 한글판 폴더의 파일을 가리키게 한다(영문 PDF는 아직 없음)
 head = head.replace('href="%EC%B7%A8%EA%B8%89%ED%92%88%EB%AA%A9_%EC%B9%B4%ED%83%88%EB%A1%9C%EA%B7%B8.pdf"',
