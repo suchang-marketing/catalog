@@ -1,0 +1,47 @@
+구분,ko,en
+카테고리,농산물,Agricultural
+카테고리,해조류,Marine Algae
+카테고리,약재,Medicinal Herbs
+가공,원물,Raw
+가공,전처리/냉동,Prepared / Frozen
+가공,건조,Dried
+가공,액상/추출,Liquid / Extract
+가공,가공/기타,Processed / Other
+가공형태,건조(원물),Dried (Whole)
+가공형태,건조(삶은 후),Dried (Blanched)
+가공형태,건조(분말/가루),Dried (Powder)
+가공형태,건조(슬라이스/칩),Dried (Sliced / Chips)
+가공형태,건조(세절),Dried (Shredded)
+가공형태,동결건조,Freeze-dried
+가공형태,냉동(원물),Frozen (Whole)
+가공형태,전처리(박피),Prepared (Peeled)
+가공형태,전처리(염분/비소정제),Prepared (Salt / Arsenic Removed)
+가공형태,세절(입자형),Cut (Granular)
+가공형태,착즙액,Pressed Juice
+가공형태,농축액,Concentrate
+가공형태,추출물(액상),Extract (Liquid)
+가공형태,추출물(oil),Extract (Oil)
+가공형태,로스팅(볶음),Roasted
+가공형태,원물,Raw Material
+부위,어린순(싹),Young Shoots
+부위,열매/과육,Fruit / Flesh
+부위,뿌리/근경,Root / Rhizome
+부위,꽃,Flower
+부위,잎/줄기,Leaf / Stem
+부위,씨앗(종자),Seed
+부위,부산물(박),By-product (Pomace)
+부위,껍질(과피),Peel / Rind
+부위,줄기/꽃,Stem / Flower
+부위,"전초(잎,줄기,뿌리)",Whole Plant (Leaf / Stem / Root)
+부위,열매/잎,Fruit / Leaf
+부위,자실체(버섯),Fruiting Body (Mushroom)
+부위,엽체,Thallus
+부위,동물성,Animal Origin
+부위,가지/대,Branch / Stalk
+등급,일반,Conventional
+등급,친환경,Eco-friendly Certified
+등급,유기농,Organic Certified
+인증,친환경,Eco-friendly
+인증,유기농,Organic
+방식,자연산,Wild-harvested
+방식,양식,Farmed
