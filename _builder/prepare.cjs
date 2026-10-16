@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '..');
 const site = process.env.CATALOG_OUTPUT_DIR || path.join(root, '_site');
 const logs = process.env.CATALOG_LOG_DIR || path.join(root, '_logs');
 const readData = (text, name) => JSON.parse(text.match(new RegExp('^const '+name+'\\s*= (.+);\\r?$', 'm'))[1]);
-let body = fs.readFileSync(path.join(__dirname, '취급품목_카탈로그.html'), 'utf8').replace(/^\uFEFF?\s*<title>.*?<\/title>\s*/s, '');
+let body = fs.readFileSync(process.env.CATALOG_FRAGMENT_PATH || path.join(__dirname, '취급품목_카탈로그.html'), 'utf8').replace(/^\uFEFF?\s*<title>.*?<\/title>\s*/s, '');
 const meta = readData(body, 'META');
 const title = `제주수창 취급품목 — 원물 ${meta.total}종`;
 const desc = `청정 제주 원물 ${meta.total}종 · B2B 대량 공급. 농산물 ${meta.byCat['농산물']}종 · 해조류 ${meta.byCat['해조류']}종 · 약재 ${meta.byCat['약재']}종`;

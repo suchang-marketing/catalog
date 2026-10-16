@@ -21,7 +21,13 @@ test('영문 번역 누락 시 기존 영문 파일을 그대로 유지함',()=>
     fs.writeFileSync(path.join(dir,'en/index.html'),previous);
     const csv=path.join(dir,'items.csv');
     fs.writeFileSync(csv,'PID,품목명,원물명,영문명,학명,사용부위\n');
-    const result=spawnSync(process.execPath,[path.join(__dirname,'prepare.cjs')],{encoding:'utf8',env:{...process.env,CATALOG_OUTPUT_DIR:dir,CATALOG_ITEM_CSV:csv,CATALOG_LOG_DIR:path.join(dir,'logs'),GITHUB_STEP_SUMMARY:''}});
+    const fragment=path.join(dir,'fragment.html');
+    let html=fs.readFileSync(path.join(__dirname,'취급품목_카탈로그.html'),'utf8');
+    html=html.replace(/^(const ITEMS = )(.+);\r?$/m,(_,prefix,json)=>{
+      const items=JSON.parse(json); items[0].name='번역누락검사용가상원물'; return prefix+JSON.stringify(items)+';';
+    });
+    fs.writeFileSync(fragment,html);
+    const result=spawnSync(process.execPath,[path.join(__dirname,'prepare.cjs')],{encoding:'utf8',env:{...process.env,CATALOG_OUTPUT_DIR:dir,CATALOG_ITEM_CSV:csv,CATALOG_FRAGMENT_PATH:fragment,CATALOG_LOG_DIR:path.join(dir,'logs'),GITHUB_STEP_SUMMARY:''}});
     assert.equal(result.status,0,result.stderr);
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'refresh-status.json'))).english,'held');
     assert.deepEqual(fs.readFileSync(path.join(dir,'en/index.html')),previous);
