@@ -1,4 +1,4 @@
-// 한글 카탈로그(index.html) → 영문 카탈로그(en/index.html) 변환기
+﻿// 한글 카탈로그(index.html) → 영문 카탈로그(en/index.html) 변환기
 // 원본은 절대 건드리지 않는다. 읽기만 하고 en/ 아래에 새로 쓴다.
 // 한글판이 갱신되면 이 스크립트를 다시 돌리면 영문판이 따라온다.
 //   실행:  node build-en.js
@@ -38,6 +38,41 @@ for (const [group, ko, en] of parseCsv('en-terms.csv')) {
 }
 
 const missing = new Set();
+
+// ── 마스터 시트 보충 ─────────────────────────────────────────
+// 손으로 만든 대조표(en-names.csv·en-goods.csv)에 없는 새 이름은 원물마스터_최종의 「영문명」·「학명」 열로 채운다.
+// 대조표가 항상 우선. 시트를 못 받으면 보충 없이 진행(없는 이름은 아래 「확인 필요」로 남음).
+const SHEET_ID = '1Tqu5GIITbBdmt40LD7OMf3W7fFYJhfKJolebv6IEOns', SHEET_GID = '9001';
+function parseCsvText(text) {
+  const rows = []; let row = [], cur = '', q = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { row.push(cur); cur = ''; }
+    else if (c === '\n') { row.push(cur.replace(/\r$/, '')); rows.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if (cur || row.length) { row.push(cur.replace(/\r$/, '')); rows.push(row); }
+  return rows;
+}
+const M_ORG = new Map(), M_PROD = new Map();   // 원물명 / 품목명 → {en, latin, part, org}
+try {
+  const csv = require('child_process').execFileSync('curl', ['-sL', '--max-time', '60',
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const [hd, ...body] = parseCsvText(csv);
+  const ix = n => hd.indexOf(n);
+  if (['PID', '품목명', '원물명', '영문명', '학명', '사용부위'].some(n => ix(n) < 0)) throw new Error('시트 열 이름이 바뀜');
+  for (const r of body) {
+    if (!/^P-M\d/.test(r[ix('PID')] || '')) continue;
+    const v = { en: (r[ix('영문명')] || '').trim(), latin: (r[ix('학명')] || '').trim(), part: (r[ix('사용부위')] || '').trim(), org: (r[ix('원물명')] || '').trim() };
+    if (!v.en) continue;
+    if (!M_ORG.has(v.org)) M_ORG.set(v.org, v);
+    const pn = (r[ix('품목명')] || '').trim(); if (pn && !M_PROD.has(pn)) M_PROD.set(pn, v);
+  }
+} catch (e) { console.log('※ 마스터 시트 보충 못 함: ' + e.message); }
+const autoFilled = new Set();   // 시트 값으로 자동 채운 이름(사람이 한 번 훑어볼 목록)
 function look(map, ko, where) {
   if (ko == null || ko === '') return ko;
   const hit = map.get(ko);
@@ -49,8 +84,22 @@ const T = (group, ko) => look(TERM[group], ko, group);
 function goodName(ko) {
   if (GOODS.has(ko)) return GOODS.get(ko);
   if (NAMES.has(ko)) return NAMES.get(ko).en;
+  const m = M_PROD.get(ko);
+  if (m) {
+    // 품목명이 원물명 + 부위 꼬리(예: 마르멜로껍질)면 영문명 뒤에 부위를 붙인다
+    const part = (m.org && ko !== m.org && ko.startsWith(m.org) && TERM['부위'].get(m.part)) || '';
+    const en = part ? `${m.en}, ${part}` : m.en;
+    autoFilled.add(`품목명 ${ko} → ${en}`);
+    return en;
+  }
   missing.add(`품목명: ${ko}`);
   return ko;
+}
+// 「건조, 원물, 분말」처럼 쉼표로 묶인 가공형태는 하나씩 옮긴다
+function procForm(ko) {
+  const whole = TERM['가공형태'].get(ko);
+  if (whole !== undefined) return whole;
+  return ko.split(',').map(t => T('가공형태', t.trim())).join(', ');
 }
 
 // ── 부위(parts) 쉼표 분리 버그 고치기 ────────────────────────
@@ -88,7 +137,8 @@ const META = JSON.parse(lines[iMeta].replace(/^const META  = /, '').replace(/;\s
 const CATKEY = { '농산물': 'agri', '해조류': 'sea', '약재': 'herb' };
 
 const enItems = ITEMS.map(it => {
-  const nm = NAMES.get(it.name);
+  let nm = NAMES.get(it.name);
+  if (!nm && M_ORG.has(it.name)) { const m = M_ORG.get(it.name); nm = { en: m.en, latin: m.latin }; autoFilled.add(`원물명 ${it.name} → ${m.en} (${m.latin})`); }
   if (!nm) missing.add(`원물명: ${it.name}`);
   return {
     id: it.id,
@@ -111,7 +161,7 @@ const enItems = ITEMS.map(it => {
     img: it.img,
     goods: (it.goods || []).map(g => ({
       n: goodName(g.n),
-      f: g.f ? T('가공형태', g.f) : g.f,
+      f: g.f ? procForm(g.f) : g.f,
       p: g.p ? T('부위', g.p) : g.p,
       g: T('등급', g.g),
       u: g.u,
@@ -154,11 +204,11 @@ for (const [ko, key] of Object.entries(CATKEY)) {
 
 const REPL_HEAD = [
   ['<html lang="ko">', '<html lang="en">'],
-  ['<title>제주수창 취급품목 — 원물 237종</title>',
-    '<title>Jeju Suchang Raw Materials — 237 Items</title>'],
-  ['content="청정 제주 원물 237종 · B2B 대량 공급. 농산물 89종 · 해조류 88종 · 약재 60종"',
-    'content="237 raw materials from pristine Jeju · B2B bulk supply. 89 agricultural · 88 marine algae · 60 medicinal herbs."'],
-  ['content="제주수창 취급품목 — 원물 237종"', 'content="Jeju Suchang Raw Materials — 237 Items"'],
+  [`<title>제주수창 취급품목 — 원물 ${META.total}종</title>`,
+    `<title>Jeju Suchang Raw Materials — ${META.total} Items</title>`],
+  [`content="청정 제주 원물 ${META.total}종 · B2B 대량 공급. 농산물 ${META.byCat['농산물']}종 · 해조류 ${META.byCat['해조류']}종 · 약재 ${META.byCat['약재']}종"`,
+    `content="${META.total} raw materials from pristine Jeju · B2B bulk supply. ${META.byCat['농산물']} agricultural · ${META.byCat['해조류']} marine algae · ${META.byCat['약재']} medicinal herbs."`],
+  [`content="제주수창 취급품목 — 원물 ${META.total}종"`, `content="Jeju Suchang Raw Materials — ${META.total} Items"`],
   ['content="(주)수창 JEJU SUCHANG"', 'content="JEJU SUCHANG CO., LTD."'],
   ['content="https://suchang-marketing.github.io/catalog/"', 'content="https://suchang-marketing.github.io/catalog/en/"'],
   ['content="ko_KR"', 'content="en_US"'],
@@ -181,17 +231,16 @@ const REPL_HEAD = [
   ['<span class="t">PDF</span>', '<span class="t">PDF (KR)</span>'],
   ['<span class="flabel">분류</span>', '<span class="flabel">Category</span>'],
   ['<span class="flabel">가공</span>', '<span class="flabel">Processing</span>'],
-  ['<span class="flabel">인증</span>', '<span class="flabel">Certification</span>'],
-  ['<span class="flabel">생산</span>', '<span class="flabel">Production</span>'],
+  ['<span class="flabel">생산방식</span>', '<span class="flabel">Production Method</span>'],
   // 꼬리말
   ['<span>· 취급 품목은 해당 원물의 가공형태별 상품임. 전체 <b id="n-goods">—</b>개.</span>',
     '<span>· Products are listed per raw material by processing type — <b id="n-goods">—</b> in total.</span>'],
   ['<span>· 원물 사진 <b id="n-photos">—</b>종 수록함. 나머지는 준비 중임.</span>',
     '<span>· Photos included for <b id="n-photos">—</b> materials; the remainder are in preparation.</span>'],
-  ['<span>· <b>일반 등급이 기본이고, 일부 원물에 인증품이 더 있음.</b> "일반 · 친환경"처럼 적힌 원물은 두 등급을 함께 취급함 — 항목을 열면 어느 품목이 인증품인지 보임.</span>',
-    '<span>· <b>Conventional is the default grade; some materials are also available certified.</b> A material marked "Conventional · Eco-friendly Certified" is supplied in both grades — open the item to see which products are certified.</span>'],
-  ['<span>· <b>자연산·양식은 인증이 아니라 생산 방식임.</b></span>',
-    '<span>· <b>Wild-harvested and Farmed indicate production method, not certification.</b></span>'],
+  ['<span>· <b>생산방식은 일반이 기본이고, 일부 원물에 친환경·유기농(인증품)이 더 있음.</b> "일반 · 친환경"처럼 적힌 원물은 두 가지를 함께 취급함 — 항목을 열면 어느 품목이 인증품인지 보임.</span>',
+    '<span>· <b>Conventional is the default; some materials are also available as Eco-friendly or Organic certified products.</b> A material marked "Conventional · Eco-friendly Certified" is supplied in both — open the item to see which products are certified.</span>'],
+  ['<span>· <b>자연산·양식은 채취·양식 구분이며 인증이 아님.</b></span>',
+    '<span>· <b>Wild-harvested and Farmed describe how the material is sourced; they are not certifications.</b></span>'],
   ['<span>· <b>업사이클(ESG)</b>은 버려지던 부위·부산물을 원료로 쓰는 품목임. 위 ESG 단추로 모아 볼 수 있음.</span>',
     '<span>· <b>Upcycled (ESG)</b> products are made from parts and by-products that were previously discarded. Use the ESG button above to list them.</span>'],
   ['<span>· <b>HS코드는 6단위 참고용임.</b> 미국 HTS·관세청 두 공식자료와 대조한 값이며, 최종 세번은 수입국 세관이 정함. "확인 중"인 품목은 대조가 끝나지 않아 적지 않음.</span>',
@@ -246,8 +295,7 @@ const REPL_TAIL = [
   ['` <span style="color:var(--ink-faint);font-size:.8rem">— ${esc(it.hsChk.join(\', \'))}은(는) 세번 확인 중임</span>`',
     '` <span style="color:var(--ink-faint);font-size:.8rem">— HS code pending for ${esc(it.hsChk.join(\', \'))}</span>`'],
   ['<span class="dk">가공 형태</span>', '<span class="dk">Processing</span>'],
-  ['<span class="dk">인증</span>', '<span class="dk">Certification</span>'],
-  ['`<span class="dk">생산 방식</span>', '`<span class="dk">Production</span>'],
+  ['<span class="dk">생산방식</span>', '<span class="dk">Production Method</span>'],
   ['`<span class="dk">업사이클</span>', '`<span class="dk">Upcycled</span>'],
   ['<span style="color:var(--ink-faint);font-size:.8rem">— 버려지던 부위·부산물을 원료로 쓰는 품목임</span>',
     '<span style="color:var(--ink-faint);font-size:.8rem">— made from parts and by-products that were previously discarded</span>'],
@@ -255,8 +303,8 @@ const REPL_TAIL = [
   ['`<div class="photoslot">원물 사진은 준비 중임. 필요하시면 문의 시 함께 보내드림.</div>`',
     '`<div class="photoslot">Photo in preparation — available on request.</div>`'],
   // 엑셀 내려받기
-  ["const head = ['코드','분류','원물명','HS코드','HS 확인 중','가공형태','취급 품목','사용부위','인증','생산방식','업사이클'];",
-    "const head = ['Code','Category','Material','Scientific Name','Korean Name','HS Code','HS Pending','Processing','Products','Plant Part','Certification','Production','Upcycled'];"],
+  ["const head = ['코드','분류','원물명','HS코드','HS 확인 중','가공형태','취급 품목','사용부위','생산방식','업사이클'];",
+    "const head = ['Code','Category','Material','Scientific Name','Korean Name','HS Code','HS Pending','Processing','Products','Plant Part','Production Method','Upcycled'];"],
   ["csvCell(it.id), csvCell(it.cat), csvCell(it.name),",
     "csvCell(it.id), csvCell(it.cat), csvCell(it.name), csvCell(it.sci), csvCell(it.ko),"],
   ["a.download = `제주수창_취급품목_${hits.length}종_${META.updated}.csv`;",
@@ -331,6 +379,7 @@ report.push(`영문판 생성: en/index.html  (${(Buffer.byteLength(out, 'utf8')
 report.push(`품목 ${enItems.length}종 / 상품 ${enItems.reduce((s, i) => s + i.goods.length, 0)}개`);
 const noSci = enItems.filter(i => !i.sci).length;
 report.push(`학명 없는 품목: ${noSci}`);
+if (autoFilled.size) { report.push('', `ℹ 시트 영문명으로 자동 채움 ${autoFilled.size}건(한 번 훑어볼 것):`); [...autoFilled].forEach(m => report.push('  - ' + m)); }
 if (missing.size) {
   report.push('', `⚠ 확인 필요 ${missing.size}건:`);
   [...missing].forEach(m => report.push('  - ' + m));
