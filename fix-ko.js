@@ -5,8 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const SRC = path.join(__dirname, 'index.html');
-const BAK = path.join(__dirname, 'index.ko-backup.html');
+const outputRoot = process.env.CATALOG_OUTPUT_DIR || __dirname;
+const SRC = path.join(outputRoot, 'index.html');
+const BAK = path.join(outputRoot, 'index.ko-backup.html');
 
 if (!fs.existsSync(BAK)) fs.copyFileSync(SRC, BAK);   // 백업은 한 번만 (재실행해도 원본이 안 덮인다)
 
@@ -62,5 +63,5 @@ const msg = [
   `부위 되돌린 품목: ${fixed}개`,
   `언어 전환 단추: ${added ? '추가함' : '이미 있어서 건너뜀'}`,
 ].join('\n');
-fs.writeFileSync(path.join(__dirname, 'fix-ko-report.txt'), msg, 'utf8');
+fs.writeFileSync(path.join(outputRoot, 'fix-ko-report.txt'), msg, 'utf8');
 console.log(msg);

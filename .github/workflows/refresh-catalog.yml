@@ -1,0 +1,95 @@
+name: 웹카달로그 갱신
+
+on:
+  schedule:
+    - cron: '0 22 * * *' # 한국시간 매일 07:00. GitHub 상황에 따라 지연될 수 있음.
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/refresh-catalog.yml'
+      - '_builder/**'
+      - 'package*.json'
+      - 'build-en.js'
+      - 'fix-ko.js'
+      - 'en-*.csv'
+
+concurrency:
+  group: catalog-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: PDF·한글 글꼴 준비
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: 시트 검사 및 한글·영문·PDF 생성
+        shell: pwsh
+        run: ./_builder/build.ps1
+      - name: 잘못된 시트·영문 번역 누락 보호 검사
+        run: npm test
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalog-output
+          path: _site
+          include-hidden-files: true
+          retention-days: 7
+      - name: 실행 기록 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-build-logs
+          path: _logs
+          retention-days: 30
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+      contents: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 웹카달로그 발행
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          name: catalog-output
+          path: _site
+      - name: 마지막 발행본 및 실행일 저장
+        shell: bash
+        run: |
+          cp -a _site/. .
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- index.html en/index.html og.png en/og.png 취급품목_카탈로그.pdf refresh-status.json .nojekyll
+          git commit -m '웹카달로그 자동 갱신'
+          git push origin HEAD:main
+          echo '✅ 발행 완료. 한글·영문 주소에서 확인할 수 있음.' >> "$GITHUB_STEP_SUMMARY"

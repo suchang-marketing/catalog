@@ -1,6 +1,15 @@
 index.ko-backup.html
 build-report.txt
 fix-ko-report.txt
+node_modules/
+_site/
+_logs/
+_builder/_source/
+_builder/*_미러.csv
+_builder/카탈로그_원물단위.csv
+_builder/카탈로그_상품단위.csv
+_builder/취급품목_카탈로그.html
 
 # 내부 작업 노트 — 공개 저장소에 올리지 않는다 (2026-08-25)
 🔧 영문카탈로그 진행상황.md
+debug.log

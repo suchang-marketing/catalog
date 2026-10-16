@@ -5,8 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const SRC = path.join(__dirname, 'index.html');
-const OUT_DIR = path.join(__dirname, 'en');
+const outputRoot = process.env.CATALOG_OUTPUT_DIR || __dirname;
+const SRC = path.join(outputRoot, 'index.html');
+const OUT_DIR = path.join(outputRoot, 'en');
 const OUT = path.join(OUT_DIR, 'index.html');
 
 // ── 대조표 읽기 ─────────────────────────────────────────────
@@ -59,8 +60,10 @@ function parseCsvText(text) {
 }
 const M_ORG = new Map(), M_PROD = new Map();   // 원물명 / 품목명 → {en, latin, part, org}
 try {
-  const csv = require('child_process').execFileSync('curl', ['-sL', '--max-time', '60',
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const csv = process.env.CATALOG_ITEM_CSV
+    ? fs.readFileSync(process.env.CATALOG_ITEM_CSV, 'utf8')
+    : require('child_process').execFileSync('curl', ['-fsSL', '--max-time', '60',
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const [hd, ...body] = parseCsvText(csv);
   const ix = n => hd.indexOf(n);
   if (['PID', '품목명', '원물명', '영문명', '학명', '사용부위'].some(n => ix(n) < 0)) throw new Error('시트 열 이름이 바뀜');
@@ -386,5 +389,5 @@ if (missing.size) {
 } else {
   report.push('빠짐 없음 — 모든 한글값이 영문으로 바뀜');
 }
-fs.writeFileSync(path.join(__dirname, 'build-report.txt'), report.join('\n'), 'utf8');
+fs.writeFileSync(path.join(outputRoot, 'build-report.txt'), report.join('\n'), 'utf8');
 console.log(report.join('\n'));
