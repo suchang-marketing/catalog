@@ -1,4 +1,4 @@
-id,cat,ko,en,latin,check
+﻿id,cat,ko,en,latin,check
 M067,농산물,가시두릅,Prickly Castor-oil Tree Shoots,Kalopanax septemlobus,확인필요
 M086,농산물,가지,Eggplant,Solanum melongena,
 M006,농산물,감자,Potato,Solanum tuberosum,
@@ -236,3 +236,11 @@ M216,약재,한련초,False Daisy,Eclipta prostrata,
 M217,약재,헛개나무,Oriental Raisin Tree,Hovenia dulcis,
 M219,약재,황칠나무,Dendropanax (Golden Lacquer Tree),Dendropanax morbiferus,
 M218,약재,후박나무,Red Machilus,Machilus thunbergii,
+M038,농산물,산물귤,Sanmul Mandarin,Citrus sunki,
+M089,해조류,검둥감태,Dark Ecklonia Kelp,Ecklonia cava subsp. kurome,
+M095,해조류,다시마,Kombu Kelp,Saccharina japonica,
+M097,해조류,돌미역,Wild Sea Mustard,Undaria pinnatifida,
+M099,해조류,미역귀,Mekabu (Wakame Sporophyll),Undaria pinnatifida,
+M171,해조류,참개도박,Grateloupia (Chamgaedobak),Grateloupia elliptica,
+M199,약재,백수오,Baeksuo (Cynanchum),Cynanchum wilfordii,
+M063,약재,천화분,Trichosanthes (Cheonhwabun),Trichosanthes kirilowii,
