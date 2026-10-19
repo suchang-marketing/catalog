@@ -39,7 +39,8 @@ foreach ($필수 in 'PID','MID','게시상태','카테고리','사용부위','�
 }
 
 # 도입검토·비공개·수입 원료는 카탈로그에 싣지 않는다(대외 문서이므로 게시된 것만).
-$rows = @($all | Where-Object { $_.'PID' -match '^P-M\d' -and $_.'게시상태'.Trim() -eq '게시' })
+# 10-19: 홈페이지와 같게 도입검토 상태의 수입 원료(P-I…)도 싣는다(분류 「수입 원료」).
+$rows = @($all | Where-Object { $_.'PID' -match '^P-[MI]\d' -and $_.'게시상태'.Trim() -in @('게시','도입검토') })
 $제외 = $all.Count - $rows.Count
 
 $가공단계 = @{
@@ -93,7 +94,7 @@ $err = @()
 $mids = $mirror.'Material ID' | Where-Object { $_ } | Sort-Object -Unique
 # 종수는 고정하지 않는다(원물이 늘고 주는 것이 정상). 갑작스러운 급감(사고 신호)만 막는다.
 if ($mids.Count -lt 200) { $err += "원물이 $($mids.Count)종뿐임 — 받은 파일이 잘렸는지 확인할 것(정상은 230종 이상)" }
-$분류값 = @('농산물','해조류','약재')
+$분류값 = @('농산물','해조류','약재','수입 원료')
 $이상분류 = $mirror | Where-Object { $_.'분류' -notin $분류값 }
 if ($이상분류.Count -gt 0) { $err += "분류 이상 $($이상분류.Count)건: " + (($이상분류 | Select-Object -First 5).'Material ID' -join ', ') }
 $빈원물명 = $mirror | Where-Object { -not $_.'원물명' }

@@ -262,7 +262,7 @@ if ($전각 -gt 0) { $err += "전각문자 잔존 $($전각)건 — 표시 사�
 $마스터업사이클 = @($m | Where-Object { $_.'비고'.Trim() -eq '업사이클' -or $_.'Product ID' -in $업사이클보완 }).Count
 $산출업사이클   = @($상품 | Where-Object { $_.'업사이클' -eq 'Y' }).Count
 if ($마스터업사이클 -ne $산출업사이클) { $err += "업사이클 표시 수 불일치: 마스터 $마스터업사이클 vs 산출 $산출업사이클" }
-$미분류 = $원물 | Where-Object { $_.'분류' -notin @('농산물','해조류','약재') }
+$미분류 = $원물 | Where-Object { $_.'분류' -notin @('농산물','해조류','약재','수입 원료') }
 if ($미분류.Count -gt 0) { $err += "분류 이상 $($미분류.Count)건" }
 $중복원물 = $원물 | Group-Object 'Material ID' | Where-Object { $_.Count -gt 1 }
 if ($중복원물.Count -gt 0) { $err += "Material ID 중복 $($중복원물.Count)건" }
@@ -285,7 +285,7 @@ if ($미분류등급.Count -gt 0) { $err += "미분류 등급값 $($미분류등
 # HS 빈 칸은 두 가지 이유로 생긴다. 둘을 구분해야 한다.
 #  ①무효코드·가공형태별 상이라 일부러 뺀 것(정상)  ②미러에 애초에 없는 것(데이터 누락 — 고쳐야 함)
 # ②는 조용히 빈 칸으로 나가면 "HS가 없는 품목"으로 오인되므로 오류로 세운다.
-$hs누락 = @($m | Where-Object { -not $hsByProd.ContainsKey($_.'Product ID') -and -not $무효Prod[$_.'Product ID'] -and -not $HS갈림Prod[$_.'Product ID'] })
+$hs누락 = @($m | Where-Object { -not $hsByProd.ContainsKey($_.'Product ID') -and -not $무효Prod[$_.'Product ID'] -and -not $HS갈림Prod[$_.'Product ID'] -and $_.'Material ID' -notmatch '^I' })
 if ($hs누락.Count -gt 0) {
   $err += "HS 미러에 없는 품목 $($hs누락.Count)건: " + (($hs누락 | Select-Object -First 5).'Product ID' -join ', ') +
           " — Drive 시트 `HS코드_자동화`에 채우고 미러를 다시 받을 것"

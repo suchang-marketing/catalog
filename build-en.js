@@ -137,7 +137,7 @@ const ITEMS = JSON.parse(lines[iItems].replace(/^const ITEMS = /, '').replace(/;
 const META = JSON.parse(lines[iMeta].replace(/^const META  = /, '').replace(/;\s*$/, ''));
 
 // ── 데이터 영문화 ───────────────────────────────────────────
-const CATKEY = { '농산물': 'agri', '해조류': 'sea', '약재': 'herb' };
+const CATKEY = { '농산물': 'agri', '해조류': 'sea', '약재': 'herb', '수입 원료': 'imp' };
 
 const enItems = ITEMS.map(it => {
   let nm = NAMES.get(it.name);
@@ -176,7 +176,7 @@ const enItems = ITEMS.map(it => {
 
 // ── 정렬: 카테고리(농산물→해조류→약재) 안에서 영문명 A~Z ──
 // 한글판은 카테고리 안에서 가나다순이라, 영문판은 같은 자리에서 알파벳순이어야 바이어가 찾기 쉽다.
-const CAT_ORDER = { agri: 0, sea: 1, herb: 2 };
+const CAT_ORDER = { agri: 0, sea: 1, herb: 2, imp: 3 };
 enItems.sort((a, b) => {
   const d = (CAT_ORDER[a.catK] ?? 99) - (CAT_ORDER[b.catK] ?? 99);
   if (d !== 0) return d;
@@ -189,7 +189,7 @@ const enMeta = {
   total: META.total,
   goods: META.goods,
   rows: META.rows,
-  byCat: { agri: META.byCat['농산물'], sea: META.byCat['해조류'], herb: META.byCat['약재'] },
+  byCat: { agri: META.byCat['농산물'], sea: META.byCat['해조류'], herb: META.byCat['약재'], imp: META.byCat['수입 원료'] },
   updated: META.updated,
   photos: META.photos,
 };
@@ -205,13 +205,16 @@ for (const [ko, key] of Object.entries(CATKEY)) {
   head = head.replace(re, '-' + key);
   tail = tail.replace(re, '-' + key);
 }
+// 한글판의 「수입 원료」는 id·색 클래스에 짧게 「-수입」으로 쓰임
+head = head.replace(/-수입(?!국)/g, '-imp');
+tail = tail.replace(/-수입(?!국)/g, '-imp');
 
 const REPL_HEAD = [
   ['<html lang="ko">', '<html lang="en">'],
   [`<title>제주수창 취급품목 — 원물 ${META.total}종</title>`,
     `<title>Jeju Suchang Raw Materials — ${META.total} Items</title>`],
-  [`content="청정 제주 원물 ${META.total}종 · B2B 대량 공급. 농산물 ${META.byCat['농산물']}종 · 해조류 ${META.byCat['해조류']}종 · 약재 ${META.byCat['약재']}종"`,
-    `content="${META.total} raw materials from pristine Jeju · B2B bulk supply. ${META.byCat['농산물']} agricultural · ${META.byCat['해조류']} marine algae · ${META.byCat['약재']} medicinal herbs."`],
+  [`content="청정 제주 원물 ${META.total}종 · B2B 대량 공급. 농산물 ${META.byCat['농산물']}종 · 해조류 ${META.byCat['해조류']}종 · 약재 ${META.byCat['약재']}종 · 수입 원료 ${META.byCat['수입 원료']}종"`,
+    `content="${META.total} raw materials from pristine Jeju · B2B bulk supply. ${META.byCat['농산물']} agricultural · ${META.byCat['해조류']} marine algae · ${META.byCat['약재']} medicinal herbs · ${META.byCat['수입 원료']} imported ingredients."`],
   [`content="제주수창 취급품목 — 원물 ${META.total}종"`, `content="Jeju Suchang Raw Materials — ${META.total} Items"`],
   ['content="(주)수창 JEJU SUCHANG"', 'content="JEJU SUCHANG CO., LTD."'],
   ['content="https://suchang-marketing.github.io/catalog/"', 'content="https://suchang-marketing.github.io/catalog/en/"'],
@@ -226,6 +229,7 @@ const REPL_HEAD = [
   ['<span class="dot d-agri"></span> 농산물 ', '<span class="dot d-agri"></span> Agricultural '],
   ['<span class="dot d-sea"></span> 해조류 ', '<span class="dot d-sea"></span> Marine Algae '],
   ['<span class="dot d-herb"></span> 약재 ', '<span class="dot d-herb"></span> Medicinal Herbs '],
+  ['<span class="dot d-imp"></span> 수입 원료 ', '<span class="dot d-imp"></span> Imported Ingredients '],
   ['placeholder="원물명 또는 품목으로 찾기 (예: 감태, 진피, 분말)"',
     'placeholder="Search by material, product, HS code or scientific name (e.g. Ecklonia, peel, powder)"'],
   ['>초기화<', '>Reset<'],
@@ -261,7 +265,7 @@ const REPL_HEAD = [
 
 const REPL_TAIL = [
   // 분류 이름이 영문으로 바뀌었으므로 화면 요소 id는 짧은 열쇠(agri/sea/herb)로 찾는다
-  ["CATS.forEach(c => document.getElementById('c-'+c).textContent = META.byCat[c]);",
+  ["CATS.forEach(c => document.getElementById('c-'+ck(c)).textContent = META.byCat[c]);",
     "CATS.forEach(c => document.getElementById('c-'+CATKEY[c]).textContent = META.byCat[CATKEY[c]]);"],
   ["META.updated + ' 기준'", "'As of ' + META.updated"],
   ["chipRow($('#f-upc'), ['업사이클(ESG)'], 'upc');", "chipRow($('#f-upc'), ['Upcycled (ESG)'], 'upc');"],
@@ -274,7 +278,7 @@ const REPL_TAIL = [
     '`<b>${META.total} materials</b> · ${META.goods} products · tap an item for details`'],
   ['<b>해당하는 원물이 없음</b>조건을 줄이거나 초기화해 보십시오.',
     '<b>No matching materials</b>Try fewer filters, or reset.'],
-  ['<span class="dot d-${cat}"></span><span class="catname">${cat}</span>',
+  ['<span class="dot d-${ck(cat)}"></span><span class="catname">${cat}</span>',
     '<span class="dot d-${CATKEY[cat]}"></span><span class="catname">${cat}</span>'],
   ['<span class="catcount">${rows.length}종</span>', '<span class="catcount">${rows.length}</span>'],
   ['`<span class="more"> 외 ${it.hs.length-1}</span>`', '`<span class="more"> +${it.hs.length-1}</span>`'],
@@ -368,8 +372,8 @@ const out = [
   head,
   'const ITEMS = ' + JSON.stringify(enItems) + ';',
   'const META  = ' + JSON.stringify(enMeta) + ';',
-  "const CATS  = ['Agricultural','Marine Algae','Medicinal Herbs'];",
-  "const CATKEY = {'Agricultural':'agri','Marine Algae':'sea','Medicinal Herbs':'herb'};",
+  "const CATS  = ['Agricultural','Marine Algae','Medicinal Herbs','Imported Ingredients'];",
+  "const CATKEY = {'Agricultural':'agri','Marine Algae':'sea','Medicinal Herbs':'herb','Imported Ingredients':'imp'};",
   'const PROCS = ' + JSON.stringify(['Raw', 'Prepared / Frozen', 'Dried', 'Liquid / Extract', 'Processed / Other']) + ';',
   tail,
 ].join('\n');

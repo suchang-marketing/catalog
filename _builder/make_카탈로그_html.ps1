@@ -104,7 +104,7 @@ $meta = [pscustomobject]@{
   byCat   = [ordered]@{}
   updated = (Get-Date -Format 'yyyy-MM-dd')
 }
-foreach ($c in @('농산물','해조류','약재')) { $meta.byCat[$c] = ($mat | Where-Object { $_.'분류' -eq $c }).Count }
+foreach ($c in @('농산물','해조류','약재','수입 원료')) { $meta.byCat[$c] = ($mat | Where-Object { $_.'분류' -eq $c }).Count }
 $meta | Add-Member -NotePropertyName photos -NotePropertyValue $photoCount
 $metaJson = $meta | ConvertTo-Json -Depth 4 -Compress
 
@@ -114,7 +114,7 @@ $tpl = @'
 :root{
   --ground:#F4F6F2; --panel:#FFFFFF; --ink:#18211D; --ink-soft:#5E6B64; --ink-faint:#8B978F;
   --line:#DFE4DD; --line-soft:#EDF0EA; --accent:#2F5D4A; --accent-soft:#E4EDE7;
-  --agri:#7E6326; --agri-bg:#F5EEDC; --sea:#28596B; --sea-bg:#E2EEF2; --herb:#6B3A4C; --herb-bg:#F3E6EA;
+  --agri:#7E6326; --agri-bg:#F5EEDC; --sea:#28596B; --sea-bg:#E2EEF2; --herb:#6B3A4C; --herb-bg:#F3E6EA; --imp:#5B6470; --imp-bg:#ECEEF1;
   --upc:#0F6E63; --upc-bg:#DCF0EC; --upc-line:#9ED4CB;
   --focus:#3D7A61;
   --r:10px; --sp:clamp(1rem,3vw,1.6rem);
@@ -123,7 +123,7 @@ $tpl = @'
   :root{
     --ground:#101413; --panel:#171D1B; --ink:#E8EDE9; --ink-soft:#9DAAA3; --ink-faint:#6E7C75;
     --line:#26302C; --line-soft:#1E2724; --accent:#7FBCA0; --accent-soft:#1C2A24;
-    --agri:#D3B472; --agri-bg:#2A2418; --sea:#8CC2D4; --sea-bg:#16262C; --herb:#D49BB0; --herb-bg:#2A1B21;
+    --agri:#D3B472; --agri-bg:#2A2418; --sea:#8CC2D4; --sea-bg:#16262C; --herb:#D49BB0; --herb-bg:#2A1B21; --imp:#A9B2BD; --imp-bg:#20242A;
     --upc:#6FD3C2; --upc-bg:#123029; --upc-line:#1F4C42;
     --focus:#8FCFB0;
   }
@@ -131,14 +131,14 @@ $tpl = @'
 :root[data-theme="dark"]{
   --ground:#101413; --panel:#171D1B; --ink:#E8EDE9; --ink-soft:#9DAAA3; --ink-faint:#6E7C75;
   --line:#26302C; --line-soft:#1E2724; --accent:#7FBCA0; --accent-soft:#1C2A24;
-  --agri:#D3B472; --agri-bg:#2A2418; --sea:#8CC2D4; --sea-bg:#16262C; --herb:#D49BB0; --herb-bg:#2A1B21;
+  --agri:#D3B472; --agri-bg:#2A2418; --sea:#8CC2D4; --sea-bg:#16262C; --herb:#D49BB0; --herb-bg:#2A1B21; --imp:#A9B2BD; --imp-bg:#20242A;
   --upc:#6FD3C2; --upc-bg:#123029; --upc-line:#1F4C42;
   --focus:#8FCFB0;
 }
 :root[data-theme="light"]{
   --ground:#F4F6F2; --panel:#FFFFFF; --ink:#18211D; --ink-soft:#5E6B64; --ink-faint:#8B978F;
   --line:#DFE4DD; --line-soft:#EDF0EA; --accent:#2F5D4A; --accent-soft:#E4EDE7;
-  --agri:#7E6326; --agri-bg:#F5EEDC; --sea:#28596B; --sea-bg:#E2EEF2; --herb:#6B3A4C; --herb-bg:#F3E6EA;
+  --agri:#7E6326; --agri-bg:#F5EEDC; --sea:#28596B; --sea-bg:#E2EEF2; --herb:#6B3A4C; --herb-bg:#F3E6EA; --imp:#5B6470; --imp-bg:#ECEEF1;
   --upc:#0F6E63; --upc-bg:#DCF0EC; --upc-line:#9ED4CB;
   --focus:#3D7A61;
 }
@@ -246,7 +246,7 @@ h1{margin:.5rem 0 .3rem; font-size:clamp(1.75rem,5vw,2.6rem); line-height:1.15; 
 .good u{text-decoration:none; color:var(--ink-soft); font-size:.72rem; margin-left:.25rem}
 .cat-농산물 .code,.cat-농산물 .nm::before{color:var(--agri)}
 .dot{width:.42rem; height:.42rem; border-radius:50%; flex:none; display:inline-block}
-.d-농산물{background:var(--agri)} .d-해조류{background:var(--sea)} .d-약재{background:var(--herb)}
+.d-농산물{background:var(--agri)} .d-해조류{background:var(--sea)} .d-약재{background:var(--herb)} .d-수입{background:var(--imp)}
 
 .detail{background:var(--panel); border:1px solid var(--accent); border-top:0;
   border-radius:0 0 var(--r) var(--r); margin-top:-2px; padding:.8rem .9rem 1rem; font-size:.88rem}
@@ -297,6 +297,7 @@ footer a{color:var(--accent)}
       <span class="unit"><span class="dot d-농산물"></span> 농산물 <b class="mono" id="c-농산물">—</b></span>
       <span class="unit"><span class="dot d-해조류"></span> 해조류 <b class="mono" id="c-해조류">—</b></span>
       <span class="unit"><span class="dot d-약재"></span> 약재 <b class="mono" id="c-약재">—</b></span>
+      <span class="unit"><span class="dot d-수입"></span> 수입 원료 <b class="mono" id="c-수입">—</b></span>
     </div>
   </header>
 </div>
@@ -356,7 +357,8 @@ footer a{color:var(--accent)}
 <script>
 const ITEMS = /*__DATA__*/;
 const META  = /*__META__*/;
-const CATS  = ['농산물','해조류','약재'];
+const CATS  = ['농산물','해조류','약재','수입 원료'];
+const ck = c => c === '수입 원료' ? '수입' : c;   // 화면 요소 id·색 클래스용 짧은 열쇠(공백 방지)
 const PROCS = ['원물','전처리/냉동','건조','액상/추출','가공/기타'];
 
 const state = { q:'', cat:new Set(), proc:new Set(), cert:new Set(), method:new Set(), upc:new Set(), open:null };
@@ -366,7 +368,7 @@ const methodList = [...new Set(ITEMS.flatMap(i=>i.method))].sort();
 const $ = s => document.querySelector(s);
 
 document.getElementById('c-total').textContent = META.total;
-CATS.forEach(c => document.getElementById('c-'+c).textContent = META.byCat[c]);
+CATS.forEach(c => document.getElementById('c-'+ck(c)).textContent = META.byCat[c]);
 document.getElementById('n-goods').textContent = META.goods;
 document.getElementById('n-photos').textContent = META.photos;
 document.getElementById('updated').textContent = META.updated + ' 기준';
@@ -434,7 +436,7 @@ function render(){
     const rows = hits.filter(i=>i.cat===cat);
     if(!rows.length) return;
     html += `<section class="catblock"><div class="cathead">
-      <span class="dot d-${cat}"></span><span class="catname">${cat}</span>
+      <span class="dot d-${ck(cat)}"></span><span class="catname">${cat}</span>
       <span class="catcount">${rows.length}종</span><span class="catrule"></span></div><div class="list">`;
     rows.forEach(it=>{
       const opened = state.open === it.id;

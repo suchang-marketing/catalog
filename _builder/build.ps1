@@ -31,7 +31,7 @@ try {
     if (-not $hs.Count -or $column -notin $hs[0].PSObject.Properties.Name) { throw "HS 시트에 '$column' 열이 없음" }
   }
   $item = @(Import-Csv -LiteralPath $itemCsv -Encoding utf8)
-  $posted = @($item | Where-Object { $_.'게시상태' -eq '게시' -and $_.'PID' -match '^P-M\d' })
+  $posted = @($item | Where-Object { $_.'게시상태' -in @('게시','도입검토') -and $_.'PID' -match '^P-[MI]\d' })
   if (@($posted | Group-Object PID | Where-Object Count -gt 1).Count) { throw '게시 품목의 PID가 중복됨' }
   Write-Host '[1/4] 시트 검사 및 카달로그 생성'
   # 사진 = 홈페이지와 같은 「사진 연동」 탭의 1번 사진(원물당 1장). 받지 못하면 중단하고 이전 화면을 유지함.
