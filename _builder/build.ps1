@@ -13,7 +13,8 @@ try {
   }
   $sheets = @(
     @{ Name='품목.csv'; Id='1Tqu5GIITbBdmt40LD7OMf3W7fFYJhfKJolebv6IEOns'; Gid='9001' },
-    @{ Name='HS.csv'; Id='1LP0TsSwlB5ck8p1RbqpjqVddDm71rwaXt2wCfWoB3S0'; Gid='0' }
+    @{ Name='HS.csv'; Id='1LP0TsSwlB5ck8p1RbqpjqVddDm71rwaXt2wCfWoB3S0'; Gid='0' },
+    @{ Name='사진연동.csv'; Id='1Tqu5GIITbBdmt40LD7OMf3W7fFYJhfKJolebv6IEOns'; Gid='9002' }
   )
   foreach ($s in $sheets) {
     $target = Join-Path $source $s.Name
@@ -33,9 +34,31 @@ try {
   $posted = @($item | Where-Object { $_.'게시상태' -eq '게시' -and $_.'PID' -match '^P-M\d' })
   if (@($posted | Group-Object PID | Where-Object Count -gt 1).Count) { throw '게시 품목의 PID가 중복됨' }
   Write-Host '[1/4] 시트 검사 및 카달로그 생성'
+  # 사진 = 홈페이지와 같은 「사진 연동」 탭의 1번 사진(원물당 1장). 받지 못하면 중단하고 이전 화면을 유지함.
+  Write-Host '[1/4] 홈페이지 1번 사진 받기'
+  $photoDir = Join-Path $source '사진'
+  if (Test-Path $photoDir) { Remove-Item -LiteralPath $photoDir -Recurse -Force }
+  New-Item -ItemType Directory -Force -Path $photoDir | Out-Null
+  $photoRows = @(Import-Csv -LiteralPath (Join-Path $source '사진연동.csv') -Encoding utf8 | Where-Object { $_.'게시상태'.Trim() -eq '게시' -and $_.'파일URL' -and $_.'MID' -in $posted.'MID' })
+  if ($photoRows.Count -lt 50) { throw "사진 연동 탭에서 게시 사진이 $($photoRows.Count)장뿐임 — 탭 구조나 공유 설정을 확인할 것." }
+  $pick = $photoRows | Group-Object 'MID' | ForEach-Object {
+    $_.Group | Sort-Object @{E={ [int]($_.'순서' -replace '\D','0') }}, @{E={ $_.'PID' }} | Select-Object -First 1
+  }
+  $failed = @()
+  foreach ($r in $pick) {
+    $url = $r.'파일URL' -replace 'sz=w\d+','sz=w180'
+    $dst = Join-Path $photoDir "$($r.'MID').jpg"
+    $done = $false
+    foreach ($try in 1..3) {
+      try { Invoke-WebRequest -Uri $url -OutFile $dst -TimeoutSec 60 | Out-Null; if ((Get-Item $dst).Length -gt 1000) { $done = $true; break } } catch { Start-Sleep -Seconds 3 }
+    }
+    if (-not $done) { $failed += "$($r.'MID') $($r.'원물명')" }
+  }
+  if ($failed.Count) { throw "홈페이지 사진을 받지 못함 $($failed.Count)건: $($failed -join ', ')" }
+  Write-Host "  사진 $($pick.Count)종(원물당 순서가 가장 앞선 게시 사진)"
   & (Join-Path $PSScriptRoot 'build_원물마스터.ps1')
   & (Join-Path $PSScriptRoot 'build_카탈로그.ps1')
-  & (Join-Path $PSScriptRoot 'make_카탈로그_html.ps1') -LogoFile (Join-Path $PSScriptRoot '로고/수창로고_웹.png') -PhotoDir (Join-Path $PSScriptRoot '사진썸네일')
+  & (Join-Path $PSScriptRoot 'make_카탈로그_html.ps1') -LogoFile (Join-Path $PSScriptRoot '로고/수창로고_웹.png') -PhotoDir $photoDir
   $env:CATALOG_OUTPUT_DIR = $site
   $env:CATALOG_ITEM_CSV = $itemCsv
   Write-Host '[2/4] 한글·영문 웹페이지 생성'
