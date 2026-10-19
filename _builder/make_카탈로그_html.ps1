@@ -99,7 +99,8 @@ $items = foreach ($m in $mat) {
 $json = $items | ConvertTo-Json -Depth 6 -Compress
 $meta = [pscustomobject]@{
   total   = $mat.Count
-  goods   = $prod.Count
+  goods   = @($prod.'Product ID' | Sort-Object -Unique).Count   # 상품 수 = 시트 상품(PID) 기준(가공형태별 줄 수 아님)
+  rows    = $prod.Count                                          # 가공형태별 상품 줄 수(내부 검사용)
   byCat   = [ordered]@{}
   updated = (Get-Date -Format 'yyyy-MM-dd')
 }
@@ -569,6 +570,6 @@ if ($err.Count -gt 0) {
 
 Write-Host "[통과] 웹 카탈로그 생성 완료" -ForegroundColor Green
 Write-Host "  경로   : $Out ($([Math]::Round((Get-Item $Out).Length/1KB)) KB)"
-Write-Host "  수록   : 원물 $($items.Count)종 / 상품 $상품합 개 / 사진 $photoCount 종 / HS $화면HS 종"
+Write-Host "  수록   : 원물 $($items.Count)종 / 상품 $($meta.goods)개(가공형태별 줄 $상품합) / 사진 $photoCount 종 / HS $화면HS 종"
 Write-Host "  근거   : 검사 11항목(치환·로고·PDF링크·항목수·이름공백·상품수·사진수·업사이클수·HS수) 통과"
 Write-Host "  단추   : 엑셀(화면에 보이는 목록을 CSV로) · PDF($PdfUrl)"

@@ -17,8 +17,8 @@ const site = process.env.CATALOG_OUTPUT_DIR || path.resolve(__dirname,'../_site'
       const page = await browser.newPage();
       const errors=[]; page.on('pageerror',e=>errors.push(e.message));
       await page.goto(pathToFileURL(path.join(site,lang,'index.html')).href);
-      const result = await page.evaluate(()=>({count:ITEMS.length,total:META.total,goods:META.goods,actual:ITEMS.reduce((s,i)=>s+i.goods.length,0),link:document.querySelector('#dl-pdf')?.getAttribute('href'),languages:document.querySelectorAll('.langsw a').length}));
-      assert.equal(result.count,result.total); assert.equal(result.goods,result.actual);
+      const result = await page.evaluate(()=>({count:ITEMS.length,total:META.total,goods:META.goods,rows:META.rows,actual:ITEMS.reduce((s,i)=>s+i.goods.length,0),link:document.querySelector('#dl-pdf')?.getAttribute('href'),languages:document.querySelectorAll('.langsw a').length}));
+      assert.equal(result.count,result.total); assert.equal(result.rows,result.actual); assert(result.goods<=result.rows);
       assert.equal(result.languages,2); assert(result.link,'PDF 다운로드 링크 없음');
       const file=path.resolve(site,lang,decodeURIComponent(result.link));
       assert(fs.existsSync(file),'PDF 링크가 파일을 가리키지 않음');
