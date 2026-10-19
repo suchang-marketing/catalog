@@ -188,6 +188,7 @@ enItems.sort((a, b) => {
 const enMeta = {
   total: META.total,
   goods: META.goods,
+  rows: META.rows,
   byCat: { agri: META.byCat['농산물'], sea: META.byCat['해조류'], herb: META.byCat['약재'] },
   updated: META.updated,
   photos: META.photos,
