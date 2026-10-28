@@ -39,7 +39,7 @@ try {
   $photoDir = Join-Path $source '사진'
   if (Test-Path $photoDir) { Remove-Item -LiteralPath $photoDir -Recurse -Force }
   New-Item -ItemType Directory -Force -Path $photoDir | Out-Null
-  $photoRows = @(Import-Csv -LiteralPath (Join-Path $source '사진연동.csv') -Encoding utf8 | Where-Object { $_.'게시상태'.Trim() -eq '게시' -and $_.'파일URL' -and $_.'MID' -in $posted.'MID' })
+  $photoRows = @(Import-Csv -LiteralPath (Join-Path $source '사진연동.csv') -Encoding utf8 | Where-Object { "$($_.'게시상태')".Trim() -eq '게시' -and $_.'파일URL' -and $_.'MID' -in $posted.'MID' })
   if ($photoRows.Count -lt 50) { throw "사진 연동 탭에서 게시 사진이 $($photoRows.Count)장뿐임 — 탭 구조나 공유 설정을 확인할 것." }
   $pick = $photoRows | Group-Object 'MID' | ForEach-Object {
     $_.Group | Sort-Object @{E={ [int]($_.'순서' -replace '\D','0') }}, @{E={ $_.'PID' }} | Select-Object -First 1
