@@ -43,6 +43,7 @@ const missing = new Set();
 // ── 마스터 시트 보충 ─────────────────────────────────────────
 // 손으로 만든 대조표(en-names.csv·en-goods.csv)에 없는 새 이름은 원물마스터_최종의 「영문명」·「학명」 열로 채운다.
 // 대조표가 항상 우선. 시트를 못 받으면 보충 없이 진행(없는 이름은 아래 「확인 필요」로 남음).
+// 10-28: 수입 원료(P-I)도 보충한다 — 시트에서 이름을 바꿔도 「영문명」 칸만 채우면 되게(코드를 못 만지는 담당자용).
 const SHEET_ID = '1Tqu5GIITbBdmt40LD7OMf3W7fFYJhfKJolebv6IEOns', SHEET_GID = '9001';
 function parseCsvText(text) {
   const rows = []; let row = [], cur = '', q = false;
@@ -68,7 +69,7 @@ try {
   const ix = n => hd.indexOf(n);
   if (['PID', '품목명', '원물명', '영문명', '학명', '사용부위'].some(n => ix(n) < 0)) throw new Error('시트 열 이름이 바뀜');
   for (const r of body) {
-    if (!/^P-M\d/.test(r[ix('PID')] || '')) continue;
+    if (!/^P-[MI]\d/.test(r[ix('PID')] || '')) continue;
     const v = { en: (r[ix('영문명')] || '').trim(), latin: (r[ix('학명')] || '').trim(), part: (r[ix('사용부위')] || '').trim(), org: (r[ix('원물명')] || '').trim() };
     if (!v.en) continue;
     if (!M_ORG.has(v.org)) M_ORG.set(v.org, v);
@@ -76,10 +77,12 @@ try {
   }
 } catch (e) { console.log('※ 마스터 시트 보충 못 함: ' + e.message); }
 const autoFilled = new Set();   // 시트 값으로 자동 채운 이름(사람이 한 번 훑어볼 목록)
+// 용어(가공형태·부위 등)는 시트에 영문 칸이 없어 담당자가 고칠 수 없다 → 영문판을 보류하지 않고 한글 그대로 두고 경고만 남긴다.
+const termKept = new Set();
 function look(map, ko, where) {
   if (ko == null || ko === '') return ko;
   const hit = map.get(ko);
-  if (hit === undefined) { missing.add(`${where}: ${ko}`); return ko; }
+  if (hit === undefined) { termKept.add(`${where}: ${ko}`); return ko; }
   return hit;
 }
 const T = (group, ko) => look(TERM[group], ko, group);
@@ -388,11 +391,16 @@ report.push(`품목 ${enItems.length}종 / 상품 ${enItems.reduce((s, i) => s +
 const noSci = enItems.filter(i => !i.sci).length;
 report.push(`학명 없는 품목: ${noSci}`);
 if (autoFilled.size) { report.push('', `ℹ 시트 영문명으로 자동 채움 ${autoFilled.size}건(한 번 훑어볼 것):`); [...autoFilled].forEach(m => report.push('  - ' + m)); }
+if (termKept.size) {
+  report.push('', `ℹ 용어표(en-terms.csv)에 없어 영문판에 한글 그대로 둔 값 ${termKept.size}건(영문판은 정상 갱신):`);
+  [...termKept].forEach(m => report.push('  - ' + m));
+  console.log(`::warning::영문 용어표에 없는 값 ${termKept.size}건은 영문판에 한글 그대로 표시함: ${[...termKept].join(', ')}`);
+}
 if (missing.size) {
-  report.push('', `⚠ 확인 필요 ${missing.size}건:`);
+  report.push('', `⚠ 확인 필요 ${missing.size}건 — 시트 「품목」 탭에서 해당 품목의 「영문명」·「학명」 칸을 채운 뒤 다시 실행:`);
   [...missing].forEach(m => report.push('  - ' + m));
 } else {
-  report.push('빠짐 없음 — 모든 한글값이 영문으로 바뀜');
+  report.push(termKept.size ? '원물명·품목명 빠짐 없음' : '빠짐 없음 — 모든 한글값이 영문으로 바뀜');
 }
 fs.writeFileSync(path.join(outputRoot, 'build-report.txt'), report.join('\n'), 'utf8');
 console.log(report.join('\n'));

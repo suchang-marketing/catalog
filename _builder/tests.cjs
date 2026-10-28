@@ -4,13 +4,28 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-test('알 수 없는 공급형태는 결과 파일을 쓰기 전에 차단함',()=>{
+test('새 공급형태·생산방식은 멈추지 않고 가공/기타·일반으로 싣고 경고함',()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'catalog-validation-'));
   try {
     const src=path.join(dir,'items.csv'),out=path.join(dir,'mirror.csv');
-    fs.writeFileSync(src,'PID,MID,게시상태,카테고리,사용부위,생산방식,품목명,원물명,공급형태\nP-M001-01,M001,게시,농산물,열매,일반,테스트,테스트,허용되지않는값\n');
+    const rows=Array.from({length:160},(_,i)=>{const n=String(i+1).padStart(3,'0');return `P-M${n}-01,M${n},게시,농산물,열매,일반,테스트${n},테스트${n},분말`;});
+    rows[0]='P-M001-01,M001,게시,농산물,열매,일반,테스트001,테스트001,새가공값';
+    rows[1]='P-M002-01,M002,게시,농산물,열매,새생산값,테스트002,테스트002,분말';
+    fs.writeFileSync(src,'PID,MID,게시상태,카테고리,사용부위,생산방식,품목명,원물명,공급형태\n'+rows.join('\n')+'\n');
+    const result=spawnSync('pwsh',['-NoProfile','-File',path.join(__dirname,'build_원물마스터.ps1'),'-Src',src,'-Out',out],{encoding:'utf8',env:{...process.env,GITHUB_STEP_SUMMARY:''}});
+    assert.equal(result.status,0,result.stderr); assert.match(result.stdout,/::warning::새 공급형태 '새가공값'/); assert.match(result.stdout,/::warning::새 생산방식 '새생산값'/);
+    const mirror=fs.readFileSync(out,'utf8');
+    assert.match(mirror,/"P-M001-01","테스트001","열매","가공\/기타","새가공값","일반"/);
+    assert.match(mirror,/"P-M002-01","테스트002","열매","건조","분말","일반"/);
+  } finally { fs.rmSync(dir,{recursive:true,force:true}); }
+});
+test('원물이 갑자기 150종 밑으로 줄면 결과 파일을 쓰기 전에 차단함',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'catalog-validation-'));
+  try {
+    const src=path.join(dir,'items.csv'),out=path.join(dir,'mirror.csv');
+    fs.writeFileSync(src,'PID,MID,게시상태,카테고리,사용부위,생산방식,품목명,원물명,공급형태\nP-M001-01,M001,게시,농산물,열매,일반,테스트,테스트,분말\n');
     const result=spawnSync('pwsh',['-NoProfile','-File',path.join(__dirname,'build_원물마스터.ps1'),'-Src',src,'-Out',out],{encoding:'utf8'});
-    assert.notEqual(result.status,0); assert.match(result.stderr,/새 공급형태/); assert(!fs.existsSync(out));
+    assert.notEqual(result.status,0); assert(!fs.existsSync(out));
   } finally { fs.rmSync(dir,{recursive:true,force:true}); }
 });
 test('영문 번역 누락 시 기존 영문 파일을 그대로 유지함',()=>{
