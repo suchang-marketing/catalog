@@ -27,8 +27,8 @@ jobs:
     env:
       TZ: Asia/Seoul
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -43,10 +43,10 @@ jobs:
         run: ./_builder/build.ps1
       - name: 잘못된 시트·영문 번역 누락 보호 검사
         run: npm test
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: catalog-output
           path: _site
@@ -54,7 +54,7 @@ jobs:
           retention-days: 7
       - name: 실행 기록 보관
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: catalog-build-logs
           path: _logs
@@ -75,11 +75,11 @@ jobs:
     steps:
       - name: 웹카달로그 발행
         id: deployment
-        uses: actions/deploy-pages@v4
-      - uses: actions/checkout@v4
+        uses: actions/deploy-pages@v5
+      - uses: actions/checkout@v7
         with:
           ref: main
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: catalog-output
           path: _site

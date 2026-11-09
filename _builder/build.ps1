@@ -34,7 +34,9 @@ try {
   $posted = @($item | Where-Object { $_.'게시상태' -in @('게시','도입검토') -and $_.'PID' -match '^P-[MI]\d' })
   if (@($posted | Group-Object PID | Where-Object Count -gt 1).Count) { throw '게시 품목의 PID가 중복됨' }
   Write-Host '[1/4] 시트 검사 및 카달로그 생성'
-  # 사진 = 홈페이지와 같은 「사진 연동」 탭의 1번 사진(원물당 1장). 받지 못하면 중단하고 이전 화면을 유지함.
+  # 사진 = 홈페이지와 같은 「사진 연동」 탭의 1번 사진(원물당 1장).
+  # 받지 못한 사진은 저장소에 보관한 이전 사진(_builder/사진썸네일)으로 대신하고 경고만 남김.
+  # 이전 사진도 없는 원물만 있을 때 중단함 — 사진 한두 장의 링크 문제로 매일 갱신이 멈추지 않게 함.
   Write-Host '[1/4] 홈페이지 1번 사진 받기'
   $photoDir = Join-Path $source '사진'
   if (Test-Path $photoDir) { Remove-Item -LiteralPath $photoDir -Recurse -Force }
@@ -44,7 +46,9 @@ try {
   $pick = $photoRows | Group-Object 'MID' | ForEach-Object {
     $_.Group | Sort-Object @{E={ [int]($_.'순서' -replace '\D','0') }}, @{E={ $_.'PID' }} | Select-Object -First 1
   }
+  $cachedDir = Join-Path $PSScriptRoot '사진썸네일'
   $failed = @()
+  $reused = @()
   foreach ($r in $pick) {
     $url = $r.'파일URL' -replace 'sz=w\d+','sz=w180'
     $dst = Join-Path $photoDir "$($r.'MID').jpg"
@@ -52,10 +56,23 @@ try {
     foreach ($try in 1..3) {
       try { Invoke-WebRequest -Uri $url -OutFile $dst -TimeoutSec 60 | Out-Null; if ((Get-Item $dst).Length -gt 1000) { $done = $true; break } } catch { Start-Sleep -Seconds 3 }
     }
-    if (-not $done) { $failed += "$($r.'MID') $($r.'원물명')" }
+    if ($done) { continue }
+    Remove-Item -LiteralPath $dst -Force -ErrorAction SilentlyContinue
+    $cached = Join-Path $cachedDir "$($r.'MID').jpg"
+    if (Test-Path -LiteralPath $cached) {
+      Copy-Item -LiteralPath $cached -Destination $dst -Force
+      $reused += "$($r.'MID') $($r.'원물명')"
+    } else {
+      $failed += "$($r.'MID') $($r.'원물명')"
+    }
   }
-  if ($failed.Count) { throw "홈페이지 사진을 받지 못함 $($failed.Count)건: $($failed -join ', ')" }
-  Write-Host "  사진 $($pick.Count)종(원물당 순서가 가장 앞선 게시 사진)"
+  if ($reused.Count) {
+    $list = $reused -join ', '
+    Write-Host "::warning::홈페이지 사진을 받지 못해 저장된 이전 사진으로 대신함 $($reused.Count)건: $list — 시트 「사진 연동」 탭의 파일URL과 드라이브 공유 설정을 확인할 것."
+    if ($env:GITHUB_STEP_SUMMARY) { "⚠️ 사진 $($reused.Count)건은 받지 못해 이전 사진 사용: $list" | Add-Content $env:GITHUB_STEP_SUMMARY }
+  }
+  if ($failed.Count) { throw "홈페이지 사진을 받지 못했고 저장된 이전 사진도 없음 $($failed.Count)건: $($failed -join ', ')" }
+  Write-Host "  사진 $($pick.Count)종(원물당 순서가 가장 앞선 게시 사진, 이전 사진 대체 $($reused.Count)건)"
   & (Join-Path $PSScriptRoot 'build_원물마스터.ps1')
   & (Join-Path $PSScriptRoot 'build_카탈로그.ps1')
   & (Join-Path $PSScriptRoot 'make_카탈로그_html.ps1') -LogoFile (Join-Path $PSScriptRoot '로고/수창로고_웹.png') -PhotoDir $photoDir
