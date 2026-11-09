@@ -1,0 +1,34 @@
+name: 사진 진단(임시)
+on:
+  push:
+    branches: [diag/photo-check]
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - shell: pwsh
+        run: |
+          $csv = "$env:RUNNER_TEMP/photos.csv"
+          Invoke-WebRequest -Uri 'https://docs.google.com/spreadsheets/d/1Tqu5GIITbBdmt40LD7OMf3W7fFYJhfKJolebv6IEOns/export?format=csv&gid=9002' -OutFile $csv
+          $rows = Import-Csv -LiteralPath $csv -Encoding utf8
+          Write-Host "열 이름: $($rows[0].PSObject.Properties.Name -join ' | ')"
+          foreach ($mid in 'M001','M048','M090') {
+            Write-Host "`n===== $mid ====="
+            $rs = @($rows | Where-Object { $_.'MID' -eq $mid })
+            Write-Host "행 수: $($rs.Count)"
+            foreach ($r in $rs) {
+              $u = $r.'파일URL'
+              Write-Host "순서=$($r.'순서') 게시상태=[$($r.'게시상태')] PID=$($r.'PID') URL길이=$($u.Length)"
+              Write-Host "URL=$u"
+              if (-not $u) { continue }
+              $u180 = $u -replace 'sz=w\d+','sz=w180'
+              try {
+                $resp = Invoke-WebRequest -Uri $u180 -TimeoutSec 60 -MaximumRedirection 5
+                Write-Host "  -> HTTP $($resp.StatusCode) type=$($resp.Headers['Content-Type']) bytes=$($resp.RawContentLength)"
+              } catch {
+                $code = $_.Exception.Response.StatusCode.value__
+                Write-Host "  -> 실패 HTTP $code : $($_.Exception.Message)"
+              }
+            }
+          }
